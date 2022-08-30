@@ -1,0 +1,38 @@
+version: 2.1
+
+executors:
+  docker-executor:
+    docker:
+      - image: "cimg/base:stable"
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+
+commands:
+  curl-url:
+    description: "cURL a URL"
+    parameters:
+      url:
+        type: string
+        default: "https://www.circleci.com"
+    steps:
+      - run: sudo apt-get update && sudo apt-get install curl
+      - run: curl << parameters.url >>
+      
+jobs:
+  test1:
+    executor: docker-executor
+    steps:
+      - curl-url:
+          url: "https://www.google.com"
+    
+  test2:
+    executor: docker-executor
+    steps:
+      - curl-url
+
+workflows:
+  testing:
+    jobs:
+      - test1
+      - test2
